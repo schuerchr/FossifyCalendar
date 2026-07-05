@@ -43,6 +43,9 @@ jobs:
       #     KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
       #     KEYSTORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Set up JDK
         uses: actions/setup-java@ad2b38190b15e4d6bdf0c97fb4fca8412226d287
         with:
