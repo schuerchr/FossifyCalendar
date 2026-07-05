@@ -107,7 +107,8 @@ jobs:
           name: ${{ steps.marker.outputs.version }}
           body: "You wont find any changelog here :)"
           draft: false
-          files: app/build/outputs/apk/foss/release/*release.apk
+          # files: app/build/outputs/apk/foss/release/*release.apk
+          files: app/build/outputs/apk/foss/debug/*debug.apk
         env:
           # Use the built-in token provided by GitHub Actions
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
