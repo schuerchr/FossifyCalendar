@@ -7,11 +7,101 @@ on:
       - ".fossify/release-marker.txt"
 
 jobs:
-  call-release-workflow:
-    name: Release
-    uses: FossifyOrg/.github/.github/workflows/release.yml@main
-    with:
-      track: ${{ vars.GPLAY_TRACK || 'beta' }}
-      rollout: ${{ vars.GPLAY_ROLLOUT || '0.05' }}
-      validate_only: ${{ vars.GPLAY_DRY_RUN == 'true' }}
-    secrets: inherit
+  # call-release-workflow:
+  #   name: Release
+  #   uses: FossifyOrg/.github/.github/workflows/release.yml@main
+  #   with:
+  #     track: ${{ vars.GPLAY_TRACK || 'beta' }}
+  #     rollout: ${{ vars.GPLAY_ROLLOUT || '0.05' }}
+  #     validate_only: ${{ vars.GPLAY_DRY_RUN == 'true' }}
+  #   secrets: inherit
+
+
+# See: https://github.com/FossifyOrg/.github/blob/main/.github/workflows/release.yml
+  release_foss:
+    name: GitHub
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # - name: Harden the runner (Audit all outbound calls)
+      #   uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411
+      #   with:
+      #     egress-policy: audit
+
+      # - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      # - name: Checkout .github repository
+      #   uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      #   with:
+      #     repository: FossifyOrg/.github
+      #     path: .github-repo
+
+      # - uses: FossifyOrg/.github/.github/actions/gradle-cache@main
+      # - uses: FossifyOrg/.github/.github/actions/decode-secrets@main
+      #   env:
+      #     KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      #     KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+      #     KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+      #     KEYSTORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@ad2b38190b15e4d6bdf0c97fb4fca8412226d287
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      # - name: Build Release APK
+      #   run: ./gradlew assembleFossRelease
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      # - name: Setup NodeJS
+      #   uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+      #   with:
+      #     node-version: "20"
+      # - name: Install keep-a-changelog parser
+      #   run: npm install keep-a-changelog@2.6.2
+
+      # - name: Extract Changelog Notes
+      #   id: extract_changelog
+      #   uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+      #   with:
+      #     script: |
+      #       const path = require('path');
+      #       const { formatForGitHub } = require('./.github-repo/scripts/changelog-parser.js');
+
+      #       const changelogPath = path.join(process.env.GITHUB_WORKSPACE, 'CHANGELOG.md');
+      #       const tagVersion = "${{ needs.prepare.outputs.version_name }}";
+      #       if (!tagVersion) {
+      #         throw new Error('VERSION_NAME environment variable is not set.');
+      #       }
+
+      #       try {
+      #         const notes = formatForGitHub(changelogPath, tagVersion, null, process.env.GITHUB_REPOSITORY);
+      #         core.setOutput('changelog', notes);
+      #       } catch (error) {
+      #         core.setFailed(error.message);
+      #         return;
+      #       }
+
+      # - id: app-token
+      #   uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+      #   with:
+      #     app-id: ${{ secrets.APP_ID }}
+      #     private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b
+        with:
+          tag_name: ${{ needs.prepare.outputs.version_name }}
+          name: ${{ needs.prepare.outputs.version_name }}
+          body: "You wont find any changelog here :)"
+          draft: false
+          files: app/build/outputs/apk/foss/release/*release.apk
+        env:
+          # Use the built-in token provided by GitHub Actions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up secrets
+        if: always()
+        uses: FossifyOrg/.github/.github/actions/cleanup-secrets@main
