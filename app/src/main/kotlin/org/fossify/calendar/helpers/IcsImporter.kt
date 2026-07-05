@@ -509,6 +509,10 @@ class IcsImporter(val activity: SimpleActivity) {
             val calendar = CalendarEntity(null, calendarTitle, newTypeColor)
             eventsHelper.insertOrUpdateCalendarSync(calendar)
         } else {
+            if (curCategoryColor != -2) {
+                val calendar = CalendarEntity(calendarId, calendarTitle, curCategoryColor)
+                eventsHelper.insertOrUpdateCalendarSync(calendar)
+            }
             calendarId
         }
     }
