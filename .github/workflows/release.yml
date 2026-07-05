@@ -46,6 +46,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Read release marker
+        id: marker
+        run: |
+          # Extract the version from the second line of the marker file
+          VERSION=$(sed -n '2p' .fossify/release-marker.txt)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Set up JDK
         uses: actions/setup-java@ad2b38190b15e4d6bdf0c97fb4fca8412226d287
         with:
@@ -96,8 +103,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b
         with:
-          tag_name: ${{ needs.prepare.outputs.version_name }}
-          name: ${{ needs.prepare.outputs.version_name }}
+          tag_name: ${{ steps.marker.outputs.version }}
+          name: ${{ steps.marker.outputs.version }}
           body: "You wont find any changelog here :)"
           draft: false
           files: app/build/outputs/apk/foss/release/*release.apk
