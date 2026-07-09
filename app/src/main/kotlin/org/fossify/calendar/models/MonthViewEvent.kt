@@ -1,5 +1,7 @@
 package org.fossify.calendar.models
 
+import android.provider.CalendarContract
+
 data class MonthViewEvent(
     val id: Long,
     val title: String,
@@ -14,5 +16,18 @@ data class MonthViewEvent(
     val isTask: Boolean,
     val isTaskCompleted: Boolean,
     val isAttendeeInviteDeclined: Boolean,
-    val isEventCanceled: Boolean
-)
+    val isEventCanceled: Boolean,
+    val status: Int = CalendarContract.Events.STATUS_CONFIRMED
+) {
+    fun shouldStrikeThrough(): Boolean {
+        return when {
+            status == CalendarContract.Events.STATUS_CANCELED -> true
+            isTask -> isTaskCompleted
+            else -> false
+        }
+    }
+
+    fun isTentativeEvent(): Boolean {
+        return status == CalendarContract.Events.STATUS_TENTATIVE
+    }
+}
