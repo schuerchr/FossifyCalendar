@@ -45,6 +45,7 @@ class IcsImporter(val activity: SimpleActivity) {
     private var curRepeatRule = 0
     private var curCalendarId = LOCAL_CALENDAR_ID
     private var curLastModified = 0L
+    private var curCategories = ""
     private var curCategoryColor = -2
     private var curAvailability = Events.AVAILABILITY_BUSY
     private var curAccessLevel = Events.ACCESS_DEFAULT
@@ -221,8 +222,9 @@ class IcsImporter(val activity: SimpleActivity) {
                             curFlags = curFlags or FLAG_TASK_COMPLETED
                         }
                     } else if (line.startsWith(CATEGORIES) && !overrideFileCalendars) {
-                        val categories = line.substring(CATEGORIES.length)
-                        tryAddCategories(categories)
+                        //val categories = line.substring(CATEGORIES.length)
+                        //tryAddCategories(categories)
+                        curCategories = line.substring(CATEGORIES.length)
                     } else if (line.startsWith(LAST_MODIFIED)) {
                         curLastModified = getTimestamp(line.substring(LAST_MODIFIED.length)) * 1000L
                     } else if (line.startsWith(EXDATE)) {
@@ -278,6 +280,10 @@ class IcsImporter(val activity: SimpleActivity) {
                         if (curTitle.isEmpty() || curStart == -1L) {
                             line = curLine
                             continue
+                        }
+
+                        if (curCategories.isNotEmpty() && !overrideFileCalendars) {
+                            tryAddCategories(curCategories)
                         }
 
                         // repeating event exceptions can have the same import id as their parents, so pick the latest event to update
@@ -551,6 +557,7 @@ class IcsImporter(val activity: SimpleActivity) {
         curCalendarId = LOCAL_CALENDAR_ID
         curLastModified = 0L
         curCategoryColor = -2
+        curCategories = ""
         isNotificationDescription = false
         isProperReminderAction = false
         isSequence = false
