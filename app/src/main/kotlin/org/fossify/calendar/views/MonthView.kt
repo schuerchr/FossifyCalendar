@@ -1,6 +1,7 @@
 package org.fossify.calendar.views
 
 import android.content.Context
+import android.provider.CalendarContract
 import android.graphics.*
 import android.text.TextPaint
 import android.text.TextUtils
@@ -161,7 +162,8 @@ class MonthView(context: Context, attrs: AttributeSet, defStyle: Int) : View(con
                         isTask = event.isTask(),
                         isTaskCompleted = event.isTaskCompleted(),
                         isAttendeeInviteDeclined = event.isAttendeeInviteDeclined(),
-                        isEventCanceled = event.isEventCanceled()
+                        isEventCanceled = event.isEventCanceled(),
+                        status = event.status
                     )
                     allEvents.add(monthViewEvent)
                 }
@@ -426,19 +428,59 @@ class MonthView(context: Context, attrs: AttributeSet, defStyle: Int) : View(con
     }
 
     private fun getEventTitlePaint(event: MonthViewEvent): Paint {
-        var paintColor = event.color.getContrastColor()
-        val adjustAlpha = when {
-            event.isTask -> dimCompletedTasks && event.isTaskCompleted
-            else -> dimPastEvents && event.isPastEvent && !isPrintVersion
-        }
-
-        if (adjustAlpha) {
-            paintColor = paintColor.adjustAlpha(HIGHER_ALPHA)
-        }
-
         val curPaint = Paint(eventTitlePaint)
-        curPaint.color = paintColor
-        curPaint.isStrikeThruText = event.shouldStrikeThrough()
+        val neutralPastColor = textColor.adjustAlpha(HIGHER_ALPHA)
+        val tentativeColor = event.color.getContrastColor().adjustAlpha(HIGHER_ALPHA)
+        val attentionColor = Color.RED
+
+        when (event.status) {
+            CalendarContract.Events.STATUS_CANCELED -> {
+                // cancelled: crossed + attention color
+                curPaint.color = attentionColor
+                curPaint.isStrikeThruText = true
+            }
+
+            CalendarContract.Events.STATUS_TENTATIVE -> {
+                // tentative: no crossing, dimmed text
+                curPaint.color = tentativeColor
+                curPaint.isStrikeThruText = false
+            }
+
+            CalendarContract.Events.STATUS_CONFIRMED -> {
+                if (!event.isTask && event.isPastEvent && !isPrintVersion) {
+                    // confirmed + past: crossed, but no attention color
+                    curPaint.color = neutralPastColor
+                    curPaint.isStrikeThruText = true
+                } else {
+                    // confirmed + upcoming (or task handling): keep current behavior
+                    var paintColor = event.color.getContrastColor()
+                    val adjustAlpha = when {
+                        event.isTask -> dimCompletedTasks && event.isTaskCompleted
+                        else -> dimPastEvents && event.isPastEvent && !isPrintVersion
+                    }
+                    if (adjustAlpha) {
+                        paintColor = paintColor.adjustAlpha(HIGHER_ALPHA)
+                    }
+                    curPaint.color = paintColor
+                    curPaint.isStrikeThruText = event.shouldStrikeThrough()
+                }
+            }
+
+            else -> {
+                // fallback
+                var paintColor = event.color.getContrastColor()
+                val adjustAlpha = when {
+                    event.isTask -> dimCompletedTasks && event.isTaskCompleted
+                    else -> dimPastEvents && event.isPastEvent && !isPrintVersion
+                }
+                if (adjustAlpha) {
+                    paintColor = paintColor.adjustAlpha(HIGHER_ALPHA)
+                }
+                curPaint.color = paintColor
+                curPaint.isStrikeThruText = event.shouldStrikeThrough()
+            }
+        }
+
         return curPaint
     }
 
