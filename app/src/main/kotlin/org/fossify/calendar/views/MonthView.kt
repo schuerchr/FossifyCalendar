@@ -454,7 +454,7 @@ class MonthView(context: Context, attrs: AttributeSet, defStyle: Int) : View(con
                 if (!event.isTask && event.isPastEvent && !isPrintVersion) {
                     // confirmed + past: crossed, but no attention color
                     curPaint.color = neutralPastColor
-                    curPaint.isStrikeThruText = true
+                    curPaint.isStrikeThruText = false
                 } else {
                     // confirmed + upcoming (or task handling): keep current behavior
                     var paintColor = event.color.getContrastColor()
