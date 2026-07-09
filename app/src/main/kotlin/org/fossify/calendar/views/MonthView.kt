@@ -427,7 +427,7 @@ class MonthView(context: Context, attrs: AttributeSet, defStyle: Int) : View(con
         if (event.status == CalendarContract.Events.STATUS_TENTATIVE) {
             //paintColor = paintColor.adjustAlpha(HIGHER_ALPHA)
             paintColor = Color.GRAY
-            paintColor = paintColor.adjustAlpha(0.9)
+            paintColor = paintColor.adjustAlpha(0.9f)
         }
 
         return getColoredPaint(paintColor)
