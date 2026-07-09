@@ -390,6 +390,12 @@ class CalDAVHelper(val context: Context) {
                 val existingEvent = importIdsMap[importId]
                 val originalEventId = existingEvent!!.id
 
+                // If the server has no color for this event, keep the locally-set color
+                // so it isn't erased by the sync.
+                if (event.color == 0 && existingEvent.color != 0) {
+                    event.color = existingEvent.color
+                }
+
                 existingEvent.apply {
                     this.id = null
                     lastUpdated = 0L
