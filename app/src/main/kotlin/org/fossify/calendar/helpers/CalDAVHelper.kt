@@ -64,7 +64,8 @@ class CalDAVHelper(val context: Context) {
                         title = calendar.displayName
                         caldavDisplayName = calendar.displayName
                         caldavEmail = calendar.accountName
-                        color = calendar.color
+                        //color = calendar.color
+                        color = localCalendar.color
                         eventsHelper.insertOrUpdateCalendarSync(this)
                     }
                 }
