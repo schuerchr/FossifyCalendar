@@ -149,22 +149,36 @@ class CalDAVHelper(val context: Context) {
         return colors[calendar.color]
     }
 
+    // TODO: Return a limited palette here?
     @SuppressLint("MissingPermission")
     fun getAvailableCalDAVCalendarColors(
         calendar: CalendarEntity,
         colorType: Int = Colors.TYPE_CALENDAR,
     ): Map<Int, String> {
-        val colors = mutableMapOf<Int, String>()
-        val uri = Colors.CONTENT_URI
-        val projection = arrayOf(Colors.COLOR, Colors.COLOR_KEY)
-        val selection = "${Colors.COLOR_TYPE} = ? AND ${Colors.ACCOUNT_NAME} = ?"
-        val selectionArgs = arrayOf(colorType.toString(), calendar.caldavEmail)
+        //val colors = mutableMapOf<Int, String>()
+        //val uri = Colors.CONTENT_URI
+        //val projection = arrayOf(Colors.COLOR, Colors.COLOR_KEY)
+        //val selection = "${Colors.COLOR_TYPE} = ? AND ${Colors.ACCOUNT_NAME} = ?"
+        //val selectionArgs = arrayOf(colorType.toString(), calendar.caldavEmail)
 
-        context.queryCursor(uri, projection, selection, selectionArgs) { cursor ->
-            val colorKey = cursor.getStringValue(Colors.COLOR_KEY)
-            val color = cursor.getIntValue(Colors.COLOR)
-            colors[color] = colorKey
-        }
+        //context.queryCursor(uri, projection, selection, selectionArgs) { cursor ->
+        //    val colorKey = cursor.getStringValue(Colors.COLOR_KEY)
+        //    val color = cursor.getIntValue(Colors.COLOR)
+        //    colors[color] = colorKey
+        //}
+        //return colors.toSortedMap(HsvColorComparator())
+
+        // Hard-coded, app-defined palette
+        val colors = mutableMapOf<Int, String>()
+
+        colors[Color.rgb(143, 240, 164)] = "green_soft"
+        colors[Color.rgb(255, 190, 111)] = "orange_soft"
+        colors[Color.rgb(246, 87, 81)]  = "red_soft"
+        colors[Color.rgb(220, 138, 221)] = "purple_soft"
+        colors[Color.rgb(205, 171, 143)] = "brown_soft"
+        colors[Color.rgb(210, 150, 148)] = "rose_soft"
+
+        // Still sorted with your comparator, if you want
         return colors.toSortedMap(HsvColorComparator())
     }
 
