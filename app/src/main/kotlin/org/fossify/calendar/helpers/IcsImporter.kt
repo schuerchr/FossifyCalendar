@@ -317,6 +317,10 @@ class IcsImporter(val activity: SimpleActivity) {
                             .sortedBy { it.minutes == REMINDER_OFF }
                             .toMutableList() as ArrayList<Reminder>
 
+                        if (curColor == 0 && curCategoryColor != -2) {
+                            curColor = curCategoryColor
+                        }
+
                         val calendar = calendars.firstOrNull { it.id == curCalendarId }
                         val source =
                             if (calDAVCalendarId == 0 || calendar?.isSyncedCalendar() == false) SOURCE_IMPORTED_ICS else "$CALDAV-$calDAVCalendarId"
