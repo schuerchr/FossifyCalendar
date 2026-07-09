@@ -425,7 +425,9 @@ class MonthView(context: Context, attrs: AttributeSet, defStyle: Int) : View(con
         }
 
         if (event.status == CalendarContract.Events.STATUS_TENTATIVE) {
-            paintColor = paintColor.adjustAlpha(HIGHER_ALPHA)
+            //paintColor = paintColor.adjustAlpha(HIGHER_ALPHA)
+            paintColor = Color.GRAY
+            paintColor = paintColor.adjustAlpha(0.9)
         }
 
         return getColoredPaint(paintColor)
@@ -446,7 +448,8 @@ class MonthView(context: Context, attrs: AttributeSet, defStyle: Int) : View(con
 
             CalendarContract.Events.STATUS_TENTATIVE -> {
                 // tentative: no crossing, dimmed text
-                curPaint.color = tentativeColor
+                //curPaint.color = tentativeColor
+                curPaint.color = Color.WHITE.adjustAlpha(HIGHER_ALPHA)
                 curPaint.isStrikeThruText = false
             }
 
